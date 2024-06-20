@@ -1,0 +1,6 @@
+streamlit==1.35.0
+langchain==0.2.3
+PyPDF2==3.0.1
+pydantic==1.10.15
+langchain-core==0.2.5  # Ajuste conforme necessário
+langchain-text-splitters==0.2.1  # Ajuste conforme necessário
