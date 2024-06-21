@@ -1,7 +1,12 @@
 import os
 import time
+import base64
+
 import streamlit as st
+from gtts import gTTS
+
 from dotenv import load_dotenv
+from io import BytesIO
 
 from langchain.embeddings import OpenAIEmbeddings
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -83,6 +88,33 @@ def user_input(user_question):
 
     print(response)
     st.write("Reply: ", response["output_text"])
+    
+    audio_fp=text_to_audio(response["output_text"])
+    # audio_file = open("output.mp3", "rb")
+    # audio_bytes = audio_file.read()
+    # st.audio(audio_bytes, format='audio/mp3').
+    audio_fp.seek(0)
+    audio_bytes = audio_fp.read()
+
+    audio_b64 = base64.b64encode(audio_bytes).decode()
+
+    audio_html = f"""
+    <audio autoplay>
+        <source src="data:audio/mp3;base64,{audio_b64}" type="audio/mp3">
+        Seu navegador não suporta o elemento de áudio.
+    </audio>
+    """
+    st.markdown(audio_html, unsafe_allow_html=True)
+
+
+
+def text_to_audio(text, lang='pt'):
+    tts = gTTS(text=text, lang=lang)
+    # tts.save('output.mp3')
+    audio_fp = BytesIO()
+    tts.write_to_fp(audio_fp)
+    return audio_fp
+
 
 
 def test_authentication():
