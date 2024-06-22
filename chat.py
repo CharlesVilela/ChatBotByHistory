@@ -1,12 +1,9 @@
 import os
 import speech_recognition as sr
-import numpy as np
-import av
 import streamlit as st
 import pyaudio
 import wave
 import threading
-from streamlit_webrtc import webrtc_streamer, WebRtcMode, AudioProcessorBase
 from PyPDF2 import PdfFileReader
 from dotenv import load_dotenv
 from utils import text
@@ -19,41 +16,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 import google.generativeai as genai
-
-# Definindo a classe AudioProcessor fora da função main
-# class AudioProcessor(AudioProcessorBase):
-    # def __init__(self):
-    #     super().__init__()
-    #     self.recorder = sr.Recognizer()
-    #     self.audio_buffer = []
-    #     self.text = ""
-
-    # def recv_queued(self, frames: list[av.AudioFrame]) -> None:
-    #     # Adicionar frames ao buffer
-    #     for frame in frames:
-    #         audio = frame.to_ndarray()
-    #         self.audio_buffer.append(audio)
-
-    #     # Processar áudio no buffer se houver dados suficientes
-    #     if len(self.audio_buffer) > 0:
-    #         audio_data = np.concatenate(self.audio_buffer, axis=0)
-    #         audio_data = sr.AudioData(audio_data.tobytes(), sample_rate=frames[0].sample_rate, sample_width=frames[0].format.sample_size)
-    #         try:
-    #             self.text = self.recorder.recognize_google(audio_data, language="pt-BR")
-    #             print('Texto convertido: ', self.text)
-    #         except sr.UnknownValueError:
-    #             self.text = "Não foi possível reconhecer o áudio"
-    #             print(self.text)
-    #         except sr.RequestError as e:
-    #             self.text = f"Erro no serviço de reconhecimento: {e}"
-    #             print(self.text)
-            
-    #         # Limpar buffer após processamento
-    #         self.audio_buffer = []
-
-    # def get_text(self):
-    #     return self.text
-
 
 # Função para gravar áudio
 def record_audio(frames, is_recording):
@@ -101,25 +63,16 @@ def main():
     st.set_page_config(page_title='Pergunte para mim...', page_icon=':books:')
     st.header("Chat with PDF using Gemini")
     st.title("Pergunte usando a sua voz")
-    user_question = st.text_input("Ask a Question from the PDF Files")
 
-    # # WebRTC para gravação de áudio
-    # webrtc_ctx = webrtc_streamer(
-    #     key="example", 
-    #     mode=WebRtcMode.SENDONLY,
-    #     rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-    #     media_stream_constraints={"audio": True, "video": False},
-    #     audio_processor_factory=AudioProcessor,
-    #     async_processing=True,
-    # )
-
-    # if webrtc_ctx.audio_processor:
-    #     recognized_text = webrtc_ctx.audio_processor.get_text()
-    #     if recognized_text:
-    #         st.text_input("Pergunta reconhecida:", value=recognized_text)
-
-
-    st.title("Gravador de audio MP3")
+    # Adicionando estilo CSS para ajustar a altura dos botões
+    st.markdown("""
+        <style>
+        .stButton > button {
+            height: 50px;
+            margin-top: 28px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
     # Inicializar estados
     if "is_recording" not in st.session_state:
@@ -128,38 +81,53 @@ def main():
         st.session_state.frames = []
     if "audio_thread" not in st.session_state:
         st.session_state.audio_thread = None
+    if "recognized_text" not in st.session_state:
+        st.session_state.recognized_text = ""
 
-    # Botão para iniciar a gravação
-    if st.button("Iniciar Gravação"):
-        if not st.session_state.is_recording["status"]:
-            st.session_state.is_recording["status"] = True
-            st.session_state.frames = []
-            st.session_state.audio_thread = threading.Thread(target=record_audio, args=(st.session_state.frames, st.session_state.is_recording))
-            st.session_state.audio_thread.start()
-            st.warning("Gravando áudio...")
+    # Criar colunas para organizar o layout
+    col1, col2 = st.columns([0.75, 0.25])
 
-    text = ""
-    # Botão para parar a gravação
-    if st.button("Parar Gravação"):
-        if st.session_state.is_recording["status"]:
-            st.session_state.is_recording["status"] = False
-            st.session_state.audio_thread.join()
-            save_audio(st.session_state.frames, "audio.wav")
-            st.success("Áudio gravado e salvo como audio.wav")
+    list_text = []
 
-            # Converter áudio em texto
-            text = audio_to_text("audio.wav")
-            st.text_area("Texto Reconhecido", text)
+    with col1:
+        user_question = st.text_input("Ask a Question from the PDF Files")
+        # Exibir texto reconhecido, se disponível
+        if st.session_state.recognized_text:
+            st.text_area("Texto Reconhecido", st.session_state.recognized_text, height=150)
+        if user_question:
+            list_text.append(user_question)
+    with col2:
+        col2_1, col2_2 = st.columns(2)
+        with col2_1:
+            if st.button("Iniciar Gravação"):
+                if not st.session_state.is_recording["status"]:
+                    st.session_state.is_recording = {"status": True}
+                    st.session_state.frames = []
+                    st.session_state.audio_thread = threading.Thread(target=record_audio, args=(st.session_state.frames, st.session_state.is_recording))
+                    st.session_state.audio_thread.start()
+                    st.warning("Gravando áudio...")
 
+        with col2_2:
+            if st.button("Parar Gravação"):
+                if st.session_state.is_recording["status"]:
+                    st.session_state.is_recording["status"] = False
+                    st.session_state.audio_thread.join()
+                    save_audio(st.session_state.frames, "audio.wav")
+                    st.success("Áudio gravado e salvo como audio.wav")
 
-    print("Mostrando o audio convertido: ", text)
+                    # Converter áudio em texto
+                    text = audio_to_text("audio.wav")
+                    st.session_state.recognized_text = text
 
-    if text is not None:
-        user_question = text
-        print("Mostrando o user question: ",user_question)
-
-    if user_question:
-        process_embeddings.user_input(user_question)
+                    # Atualizar pergunta do usuário com o texto reconhecido
+                    if text:
+                        list_text.append(text)
+    
+    for value in list_text:
+        if value is not None and value != "":
+            print(value)
+            process_embeddings.user_input(value)
+            list_text.clear()
 
     with st.sidebar:
         st.subheader('My Files')

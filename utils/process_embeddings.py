@@ -87,7 +87,10 @@ def user_input(user_question):
     )
 
     print(response)
-    st.write("Reply: ", response["output_text"])
+    # st.write("Reply: ", response["output_text"])
+    st.write("Reply:")
+    st.markdown(f'<div style="width: 100%; margin-top: 10px;">{response["output_text"]}</div>', unsafe_allow_html=True)
+    
     
     audio_fp=text_to_audio(response["output_text"])
     # audio_file = open("output.mp3", "rb")
