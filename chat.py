@@ -6,7 +6,7 @@ import wave
 import threading
 from PyPDF2 import PdfFileReader
 from dotenv import load_dotenv
-from utils import text
+from utils import text as t
 from utils import process_embeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
@@ -61,8 +61,7 @@ def audio_to_text(filename):
 
 def main():
     st.set_page_config(page_title='Pergunte para mim...', page_icon=':books:')
-    st.header("Chat with PDF using Gemini")
-    st.title("Pergunte usando a sua voz")
+    st.header("ChronoChat")
 
     # Adicionando estilo CSS para ajustar a altura dos botões
     st.markdown("""
@@ -83,6 +82,8 @@ def main():
         st.session_state.audio_thread = None
     if "recognized_text" not in st.session_state:
         st.session_state.recognized_text = ""
+    if "conversation_history" not in st.session_state:
+        st.session_state.conversation_history = []
 
     # Criar colunas para organizar o layout
     col1, col2 = st.columns([0.75, 0.25])
@@ -125,19 +126,20 @@ def main():
     
     for value in list_text:
         if value is not None and value != "":
-            print(value)
-            process_embeddings.user_input(value)
+            with st.spinner("Gerando resposta..."):
+                process_embeddings.user_input2(value)
+                # st.write(response)
             list_text.clear()
 
-    with st.sidebar:
-        st.subheader('My Files')
-        pdf_docs = st.file_uploader('Upload the your file...', accept_multiple_files=True)
-        if st.button('Process'):
-            with st.spinner('Processing...'):
-                raw_text = text.process_files(pdf_docs)
-                text_chunks = text.create_text_chunks(raw_text)
-                process_embeddings.get_vector_store(text_chunks)
-                st.success("Done")
+    # with st.sidebar:
+    #     st.subheader('My Files')
+    #     pdf_docs = st.file_uploader('Upload the your file...', accept_multiple_files=True)
+    #     if st.button('Process'):
+    #         with st.spinner('Processing...'):
+    #             raw_text = t.process_files(pdf_docs)
+    #             text_chunks = t.create_text_chunks(raw_text)
+    #             process_embeddings.get_vector_store(text_chunks)
+    #             st.success("Done")
 
 if __name__ == '__main__':
     main()

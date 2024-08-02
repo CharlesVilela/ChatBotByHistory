@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legendagem em Tempo Real</title>
+</head>
+<body>
+    <div id="legendas"></div>
+
+    <script>
+        // Verificar suporte ao Reconhecimento de Fala
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            // Configurar o reconhecimento de voz
+            let recognition = new SpeechRecognition() || new webkitSpeechRecognition();
+            recognition.lang = 'pt-BR'; // Idioma para o reconhecimento (português do Brasil)
+            recognition.continuous = true; // Reconhecimento contínuo
+            recognition.interimResults = true; // Resultados intermediários enquanto o usuário fala
+
+            // Elemento onde as legendas serão exibidas
+            let legendasElemento = document.getElementById('legendas');
+
+            // Evento disparado quando há resultados no reconhecimento de voz
+            recognition.onresult = function(event) {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        transcript += event.results[i][0].transcript;
+                    } else {
+                        transcript += event.results[i][0].transcript;
+                    }
+                }
+                // Atualizar as legendas em tempo real
+                legendasElemento.innerText = transcript;
+            }
+
+            // Evento disparado em caso de erro no reconhecimento de voz
+            recognition.onerror = function(event) {
+                console.error('Erro no reconhecimento de voz:', event.error);
+            }
+
+            // Evento disparado quando o reconhecimento de voz é encerrado
+            recognition.onend = function() {
+                console.log('Reconhecimento de voz finalizado.');
+                // Reiniciar o reconhecimento se necessário
+                recognition.start();
+            }
+
+            // Iniciar o reconhecimento de voz
+            recognition.start();
+        } else {
+            // Alerta se o navegador não suporta reconhecimento de voz
+            alert('Este navegador não suporta reconhecimento de voz.');
+        }
+    </script>
+</body>
+</html>
