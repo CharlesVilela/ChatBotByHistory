@@ -183,12 +183,12 @@ def user_input2(user_question):
 
     # # Obtém a resposta do chat
     # response = chat_session()
-    print(response.text)
+    # print(response.text)
 
-    display_realtime_captioning(response.text)
+    # display_realtime_captioning(response.text)
 
-    # st.write("Reply:")
-    # st.markdown(f'<div style="width: 100%; margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">{response.text} 😊</div>', unsafe_allow_html=True)
+    st.write("Reply:")
+    st.markdown(f'<div style="width: 100%; margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">{response.text} 😊</div>', unsafe_allow_html=True)
 
 
 

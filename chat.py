@@ -7,7 +7,7 @@ import threading
 from PyPDF2 import PdfFileReader
 from dotenv import load_dotenv
 from utils import text as t
-from utils import process_embeddings
+from utils import process_embeddings, process_embeddings2
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -16,6 +16,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 import google.generativeai as genai
+import re
 
 # Função para gravar áudio
 def record_audio(frames, is_recording):
@@ -68,7 +69,8 @@ def main():
         <style>
         .stButton > button {
             height: 50px;
-            margin-top: 28px;
+            margin-top: 63px;
+            width: 100%;
         }
         </style>
         """, unsafe_allow_html=True)
@@ -84,19 +86,29 @@ def main():
         st.session_state.recognized_text = ""
     if "conversation_history" not in st.session_state:
         st.session_state.conversation_history = []
+    if "user_question" not in st.session_state:
+        st.session_state.user_question = ""
+    if "chatbot_response" not in st.session_state:
+        st.session_state.chatbot_response = ""
+    if "isconverter_texto_audio" not in st.session_state:
+        st.session_state.isconverter_texto_audio = False
 
     # Criar colunas para organizar o layout
-    col1, col2 = st.columns([0.75, 0.25])
-
-    list_text = []
+    col1, col2 = st.columns([1, 1])
 
     with col1:
-        user_question = st.text_input("Ask a Question from the PDF Files")
+        # Botão para converter resposta em áudio
+        st.session_state.isconverter_texto_audio = st.checkbox("Converter Resposta em Áudio", value=st.session_state.isconverter_texto_audio)
+
+        user_question = st.text_input("Ask a Question from the PDF Files", value=st.session_state.user_question)
         # Exibir texto reconhecido, se disponível
         if st.session_state.recognized_text:
             st.text_area("Texto Reconhecido", st.session_state.recognized_text, height=150)
-        if user_question:
-            list_text.append(user_question)
+        
+        # Atualizar o estado com a pergunta do usuário
+        if user_question != st.session_state.user_question:
+            st.session_state.user_question = user_question
+
     with col2:
         col2_1, col2_2 = st.columns(2)
         with col2_1:
@@ -122,24 +134,42 @@ def main():
 
                     # Atualizar pergunta do usuário com o texto reconhecido
                     if text:
-                        list_text.append(text)
-    
-    for value in list_text:
-        if value is not None and value != "":
-            with st.spinner("Gerando resposta..."):
-                process_embeddings.user_input2(value)
-                # st.write(response)
-            list_text.clear()
+                        st.session_state.user_question = text
 
-    # with st.sidebar:
-    #     st.subheader('My Files')
-    #     pdf_docs = st.file_uploader('Upload the your file...', accept_multiple_files=True)
-    #     if st.button('Process'):
-    #         with st.spinner('Processing...'):
-    #             raw_text = t.process_files(pdf_docs)
-    #             text_chunks = t.create_text_chunks(raw_text)
-    #             process_embeddings.get_vector_store(text_chunks)
-    #             st.success("Done")
+    # Processar a pergunta do usuário e gerar resposta
+    if st.session_state.user_question:
+        if st.session_state.user_question != "":
+            with st.spinner("Gerando resposta..."):
+                response = process_embeddings2.user_input2(st.session_state.user_question)
+                st.session_state.chatbot_response = response.text
+
+            # Limpar a pergunta do usuário após obter a resposta
+            st.session_state.user_question = ""
+
+    # Exibir a resposta do chatbot
+    if st.session_state.chatbot_response:
+        if st.session_state.isconverter_texto_audio:
+            cleaned_response = re.sub(r'[^\w\s]', '', st.session_state.chatbot_response)
+            audio_file = process_embeddings2.text_to_audio(cleaned_response)
+            st.audio(audio_file, format='audio/mp3')
+            # st.download_button(
+            #     label="Baixar Áudio",
+            #     data=open(audio_file, "rb").read(),
+            #     file_name="response_audio.mp3",
+            #     mime="audio/mp3"
+            # )
+        else:
+            st.write("Reply:")
+            st.markdown(f'<div style="width: 100%; margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">{st.session_state.chatbot_response} 😊</div>', unsafe_allow_html=True)
+
+    with st.sidebar:
+        st.subheader('My Files')
+        pdf_docs = st.file_uploader('Upload the your file...', accept_multiple_files=True)
+        if st.button('Process'):
+            with st.spinner('Processing...'):
+                raw_text = t.process_files(pdf_docs)
+                process_embeddings2.save_message("user", raw_text)
+                st.success("Done")
 
 if __name__ == '__main__':
     main()
