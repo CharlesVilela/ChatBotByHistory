@@ -5,7 +5,7 @@ import streamlit as st
 from gtts import gTTS
 from dotenv import load_dotenv
 from io import BytesIO
-from langchain.embeddings import OpenAIEmbeddings
+# from langchain.embeddings import OpenAIEmbeddings
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -205,6 +205,8 @@ def user_input2(user_question):
     #     ],
     # },] 
     
+    print(user_question)
+
     # Carregar o histórico da conversa do banco de dados
     history = load_history()
 

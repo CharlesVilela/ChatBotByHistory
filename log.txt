@@ -1,0 +1,99 @@
+PS C:\Projetos\chatbot4> streamlit run chat.py
+
+  You can now view your Streamlit app in your browser.
+
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.0.100:8501
+
+C:\Projetos\chatbot4\env\lib\site-packages\langchain\_api\module_import.py:92: LangChainDeprecationWarning: Importing OpenAIEmbeddings from langchain.embeddings is deprecated. Please replace deprecated imports:
+
+>> from langchain.embeddings import OpenAIEmbeddings
+
+with new imports of:
+
+>> from langchain_community.embeddings import OpenAIEmbeddings
+You can use the langchain cli to **automatically** upgrade many imports. Please see documentation here https://python.langchain.com/v0.2/docs/versions/v0_2/
+  warn_deprecated(
+C:\Projetos\chatbot4\env\lib\site-packages\langchain\_api\module_import.py:92: LangChainDeprecationWarning: Importing FAISS from langchain.vectorstores is deprecated. Please replace deprecated imports:
+
+>> from langchain.vectorstores import FAISS
+
+with new imports of:
+
+>> from langchain_community.vectorstores import FAISS
+You can use the langchain cli to **automatically** upgrade many imports. Please see documentation here https://python.langchain.com/v0.2/docs/versions/v0_2/
+  warn_deprecated(
+C:\Projetos\chatbot4\env\lib\site-packages\langchain\_api\module_import.py:92: LangChainDeprecationWarning: Importing OpenAIEmbeddings from langchain.embeddings is deprecated. Please replace deprecated imports:
+
+>> from langchain.embeddings import OpenAIEmbeddings
+
+with new imports of:
+
+>> from langchain_community.embeddings import OpenAIEmbeddings
+You can use the langchain cli to **automatically** upgrade many imports. Please see documentation here https://python.langchain.com/v0.2/docs/versions/v0_2/
+  warn_deprecated(
+2024-08-06 09:15:45.226 Uncaught app exception
+Traceback (most recent call last):
+  File "C:\Projetos\chatbot4\env\lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 600, in _run_script
+    exec(code, module.__dict__)
+  File "C:\Projetos\chatbot4\chat.py", line 175, in <module>
+    main()
+  File "C:\Projetos\chatbot4\chat.py", line 143, in main
+    response = process_embeddings2.user_input2(st.session_state.user_question)
+  File "C:\Projetos\chatbot4\utils\process_embeddings2.py", line 221, in user_input2
+    chat_session.send_message({
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\generativeai\generative_models.py", line 505, in send_message
+    self._check_response(response=response, stream=stream)
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\generativeai\generative_models.py", line 532, in _check_response
+    raise generation_types.StopCandidateException(response.candidates[0])
+google.generativeai.types.generation_types.StopCandidateException: index: 0
+finish_reason: OTHER
+
+2024-08-06 09:22:24.820 Uncaught app exception
+Traceback (most recent call last):
+  File "C:\Projetos\chatbot4\env\lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 600, in _run_script
+    exec(code, module.__dict__)
+  File "C:\Projetos\chatbot4\chat.py", line 175, in <module>
+    main()
+  File "C:\Projetos\chatbot4\chat.py", line 143, in main
+    response = process_embeddings2.user_input2(st.session_state.user_question)
+  File "C:\Projetos\chatbot4\utils\process_embeddings2.py", line 221, in user_input2
+    chat_session.send_message({
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\generativeai\generative_models.py", line 505, in send_message
+    self._check_response(response=response, stream=stream)
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\generativeai\generative_models.py", line 532, in _check_response
+    raise generation_types.StopCandidateException(response.candidates[0])
+google.generativeai.types.generation_types.StopCandidateException: index: 0
+finish_reason: OTHER
+
+2024-08-06 11:02:15.352 Uncaught app exception
+Traceback (most recent call last):
+  File "C:\Projetos\chatbot4\env\lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 600, in _run_script
+    exec(code, module.__dict__)
+  File "C:\Projetos\chatbot4\chat.py", line 175, in <module>
+    main()
+  File "C:\Projetos\chatbot4\chat.py", line 143, in main
+    response = process_embeddings2.user_input2(st.session_state.user_question)
+  File "C:\Projetos\chatbot4\utils\process_embeddings2.py", line 221, in user_input2
+    chat_session.send_message({
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\generativeai\generative_models.py", line 496, in send_message
+    response = self.model.generate_content(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\generativeai\generative_models.py", line 262, in generate_content
+    response = self._client.generate_content(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\ai\generativelanguage_v1beta\services\generative_service\client.py", line 812, in generate_content
+    response = rpc(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\gapic_v1\method.py", line 131, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\retry\retry_unary.py", line 293, in retry_wrapped_func
+    return retry_target(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\retry\retry_unary.py", line 153, in retry_target
+    _retry_error_helper(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\retry\retry_base.py", line 212, in _retry_error_helper
+    raise final_exc from source_exc
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\retry\retry_unary.py", line 144, in retry_target
+    result = target()
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\timeout.py", line 120, in func_with_timeout
+    return func(*args, **kwargs)
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\grpc_helpers.py", line 78, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.ResourceExhausted: 429 Resource has been exhausted (e.g. check quota).

@@ -122,19 +122,20 @@ def main():
 
         with col2_2:
             if st.button("Parar Gravação"):
-                if st.session_state.is_recording["status"]:
-                    st.session_state.is_recording["status"] = False
-                    st.session_state.audio_thread.join()
-                    save_audio(st.session_state.frames, "audio.wav")
-                    st.success("Áudio gravado e salvo como audio.wav")
+                with st.spinner("Gerando resposta..."):
+                    if st.session_state.is_recording["status"]:
+                        st.session_state.is_recording["status"] = False
+                        st.session_state.audio_thread.join()
+                        save_audio(st.session_state.frames, "audio.wav")
+                        st.success("Áudio gravado e salvo como audio.wav")
 
-                    # Converter áudio em texto
-                    text = audio_to_text("audio.wav")
-                    st.session_state.recognized_text = text
+                        # Converter áudio em texto
+                        text = audio_to_text("audio.wav")
+                        # st.session_state.recognized_text = text
 
-                    # Atualizar pergunta do usuário com o texto reconhecido
-                    if text:
-                        st.session_state.user_question = text
+                        # Atualizar pergunta do usuário com o texto reconhecido
+                        if text:
+                            st.session_state.user_question = text
 
     # Processar a pergunta do usuário e gerar resposta
     if st.session_state.user_question:
@@ -162,14 +163,14 @@ def main():
             st.write("Reply:")
             st.markdown(f'<div style="width: 100%; margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">{st.session_state.chatbot_response} 😊</div>', unsafe_allow_html=True)
 
-    with st.sidebar:
-        st.subheader('My Files')
-        pdf_docs = st.file_uploader('Upload the your file...', accept_multiple_files=True)
-        if st.button('Process'):
-            with st.spinner('Processing...'):
-                raw_text = t.process_files(pdf_docs)
-                process_embeddings2.save_message("user", raw_text)
-                st.success("Done")
+    # with st.sidebar:
+    #     st.subheader('My Files')
+    #     pdf_docs = st.file_uploader('Upload the your file...', accept_multiple_files=True)
+    #     if st.button('Process'):
+    #         with st.spinner('Processing...'):
+    #             raw_text = t.process_files(pdf_docs)
+    #             process_embeddings2.save_message("user", raw_text)
+    #             st.success("Done")
 
 if __name__ == '__main__':
     main()

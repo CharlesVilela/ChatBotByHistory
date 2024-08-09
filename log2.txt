@@ -1,0 +1,30 @@
+Traceback (most recent call last):
+  File "C:\Projetos\chatbot4\env\lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 600, in _run_script
+    exec(code, module.__dict__)
+  File "C:\Projetos\chatbot4\chat.py", line 175, in <module>
+    main()
+  File "C:\Projetos\chatbot4\chat.py", line 143, in main
+    response = process_embeddings2.user_input2(st.session_state.user_question)
+  File "C:\Projetos\chatbot4\utils\process_embeddings2.py", line 221, in user_input2
+    chat_session.send_message({
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\generativeai\generative_models.py", line 496, in send_message
+    response = self.model.generate_content(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\generativeai\generative_models.py", line 262, in generate_content
+    response = self._client.generate_content(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\ai\generativelanguage_v1beta\services\generative_service\client.py", line 812, in generate_content
+    response = rpc(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\gapic_v1\method.py", line 131, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\retry\retry_unary.py", line 293, in retry_wrapped_func
+    return retry_target(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\retry\retry_unary.py", line 153, in retry_target
+    _retry_error_helper(
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\retry\retry_base.py", line 212, in _retry_error_helper
+    raise final_exc from source_exc
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\retry\retry_unary.py", line 144, in retry_target
+    result = target()
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\timeout.py", line 120, in func_with_timeout
+    return func(*args, **kwargs)
+  File "C:\Projetos\chatbot4\env\lib\site-packages\google\api_core\grpc_helpers.py", line 78, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.ResourceExhausted: 429 Resource has been exhausted (e.g. check quota).
