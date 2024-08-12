@@ -6,9 +6,9 @@ from gtts import gTTS
 from dotenv import load_dotenv
 from io import BytesIO
 # from langchain.embeddings import OpenAIEmbeddings
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
+# from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain.vectorstores import FAISS
-from langchain_google_genai import ChatGoogleGenerativeAI
+# from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.prompts import PromptTemplate
 from langchain.chains.question_answering import load_qa_chain
 import google.generativeai as genai
@@ -40,36 +40,36 @@ class StopCandidateException(Exception):
 def _chunks(l, n):
     return [l[i:i + n] for i in range(0, len(l), n)]
 
-def get_vector_store(text_chunks, chunk_size=5, max_retries=5, backoff_factor=2):
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=gemini_key)
-    vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
-    vector_store.save_local("faiss-index")
-    print('Finished vector store...')
+# def get_vector_store(text_chunks, chunk_size=5, max_retries=5, backoff_factor=2):
+#     embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=gemini_key)
+#     vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
+#     vector_store.save_local("faiss-index")
+#     print('Finished vector store...')
 
-def get_conversational_chain():
-    try:
-        prompt_template = """
-        You are a helpful assistant. Answer the question as detailed as possible from the provided context. If the answer is not in the provided context, say "The answer is not available in the context". Do not provide a wrong answer.
+# def get_conversational_chain():
+#     try:
+#         prompt_template = """
+#         You are a helpful assistant. Answer the question as detailed as possible from the provided context. If the answer is not in the provided context, say "The answer is not available in the context". Do not provide a wrong answer.
 
-        Context:
-        {context}
+#         Context:
+#         {context}
 
-        Question:
-        {question}
+#         Question:
+#         {question}
 
-        Answer:
-        """
-        model = ChatGoogleGenerativeAI(model='gemini-pro', temperature=0.3, google_api_key=gemini_key)
-        prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
-        chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
+#         Answer:
+#         """
+#         model = ChatGoogleGenerativeAI(model='gemini-pro', temperature=0.3, google_api_key=gemini_key)
+#         prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
+#         chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
         
-        return chain
-    except StopCandidateException as e:
-        print(f"Resposta interrompida por razões de segurança: {e}")
-        return "Desculpe, mas não posso responder a isso."
-    except Exception as e:
-        print(f"Ocorreu um erro inesperado: {e}")
-        return "Desculpe, algo deu errado."
+#         return chain
+#     except StopCandidateException as e:
+#         print(f"Resposta interrompida por razões de segurança: {e}")
+#         return "Desculpe, mas não posso responder a isso."
+#     except Exception as e:
+#         print(f"Ocorreu um erro inesperado: {e}")
+#         return "Desculpe, algo deu errado."
 
 
 # Função para exibir a página HTML com áudio e legendagem em tempo real
