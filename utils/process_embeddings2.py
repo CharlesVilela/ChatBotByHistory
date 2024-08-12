@@ -18,6 +18,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 # from transformers import BertTokenizer, BertForSequenceClassification
 # import torch
+from sqlalchemy import DateTime
+from datetime import datetime
+import pandas as pd
+
 
 # Definir variáveis de ambiente para desativar avisos e resolver conflitos
 # os.environ['HF_HUB_DISABLE_SYMLINKS_WARNING'] = '1'
@@ -146,16 +150,48 @@ class Message(Base):
     parts = Column(Text)
 
 
+class UserMessage(Base):
+    __tablename__ = 'user_history'
+
+    id = Column(Integer, Sequence('usermessage_id_seq'), primary_key=True)
+    question = Column(Text)
+    response = Column(Text)
+    timestamp = Column(DateTime, default=datetime.utcnow)
 
 # Criar a conexão com o banco de dados SQLite
 engine = create_engine('sqlite:///chat_history.db')
+new_engine = create_engine('sqlite:///user_questions.db')
 
 # Criar a tabela no banco de dados
 Base.metadata.create_all(engine)
+Base.metadata.create_all(new_engine)
 
 # Criar uma sessão para interagir com o banco de dados
 Session = sessionmaker(bind=engine)
 db_session = Session()
+
+# Criar uma sessão para o novo banco de dados
+NewSession = sessionmaker(bind=new_engine)
+new_db_session = NewSession()
+
+
+def save_user_message(question, response):
+    user_message = UserMessage(question=question, response=response)
+    new_db_session.add(user_message)
+    new_db_session.commit()
+
+def load_user_history():
+    history = []
+    messages = new_db_session.query(UserMessage).all()
+    for message in messages:
+        history.append({
+            "question": message.question,
+            "response": message.response,
+            "timestamp": message.timestamp.strftime("%Y-%m-%d %H:%M:%S")  # Formatando a data e hora
+        })
+    return history
+
+
 
 def save_message(role, parts):
     message = Message(role=role, parts=parts)
@@ -237,11 +273,28 @@ def user_input2(user_question):
 
     # display_realtime_captioning(response.text)
 
+    save_user_message(user_question, response.text)
+    createDataframe()
+
     return response
 
     # st.write("Reply:")
     # st.markdown(f'<div style="width: 100%; margin-top: 10px; background-color: #f9f9f9; padding: 10px; border-radius: 5px;">{response.text} 😊</div>', unsafe_allow_html=True)
 
+
+def createDataframe():
+    # Carregar os dados do banco de dados
+    list_bd = load_user_history()
+
+    # Verificar se há dados para evitar erro ao criar o DataFrame
+    if list_bd:
+        # Criar o DataFrame
+        df = pd.DataFrame(list_bd)
+        
+        # Exportar o DataFrame para um arquivo Excel
+        df.to_excel("C:\\Projetos\\chatbot4\\perguntas_e_respostas_usuario.xlsx", index=False)
+    else:
+        print("Nenhum dado encontrado no banco de dados.")
 
 
 # def user_input(user_question):
